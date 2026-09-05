@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NXT50: The Run</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#050510;color:white;font-family:Arial;text-align:center;overflow:hidden}
+#load,#menu,#gameover{position:fixed;inset:0;background:#050510;display:flex;flex-direction:column;align-items:center;justify-content:center}
+h1{color:#5865f2;font-size:45px;text-shadow:0 0 20px #5865f2}
+button{padding:12px 25px;border:0;border-radius:10px;background:#5865f2;color:white;font-size:18px}
+input{padding:12px;border-radius:10px;border:0}
+#bar{width:300px;height:15px;background:#222;border-radius:20px}
+#fill{height:100%;width:0;background:#5865f2;border-radius:20px}
+#game{display:none;width:95%;max-width:900px;height:400px;margin:auto;background:linear-gradient(#10152d,#050505);border:3px solid #5865f2;position:relative;overflow:hidden}
+#player{position:absolute;width:40px;height:40px;background:#5865f2;border-radius:10px;left:80px;bottom:0}
+.obs{position:absolute;bottom:0;background:#ff3864;width:35px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<div id="load">
+<h1>⚡ NXT50 ⚡</h1>
+<p id="fact">Loading...</p>
+<div id="bar"><div id="fill"></div></div>
+</div>
+
+<div id="menu" style="display:none">
+<h1>NXT50: THE RUN</h1>
+<p>50 MEMBERS SPECIAL</p>
+<input id="name" placeholder="Enter username">
+<br>
+<button onclick="start()">PLAY</button>
+</div>
+
+<div id="gameover" style="display:none">
+<h1>GAME OVER</h1>
+<p id="result"></p>
+<button onclick="location.reload()">RESTART</button>
+</div>
+
+<h2 id="score"></h2>
+
+<div id="game">
+<div id="player"></div>
+</div>
+
+<script>
+let facts=[
+"Did you know? NXT50 celebrates 50 Discord members.",
+"Did you know? Every run is different.",
+"Did you know? Your best score saves automatically.",
+"Did you know? NXT is built by the community.",
+"Did you know? The goal is 100 members next.",
+"Did you know? Jump timing is everything.",
+"Did you know? Obstacles get faster.",
+"Did you know? Your username enters the leaderboard.",
+"Did you know? NXT50 works on PC and mobile.",
+"Did you know? Every score is a new challenge.",
+"Did you know? The best runners keep trying.",
+"Did you know? NXT is always growing."
+];
+
+let i=0,p=0;
+let timer=setInterval(()=>{
+document.getElementById("fact").innerHTML=facts[i++%facts.length];
+document.getElementById("fill").style.width=(i*8)+"%";
+if(i>12){
+clearInterval(timer);
+load.style.display="none";
+menu.style.display="flex";
+}
+},200);
+
+let player=document.getElementById("player");
+let game=document.getElementById("game");
+let score=0,alive=false,y=0,v=0;
+let username="";
+
+function start(){
+username=document.getElementById("name").value||"Guest";
+menu.style.display="none";
+game.style.display="block";
+alive=true;
+loop();
+spawn();
+}
+
+function jump(){
+if(y==0)v=14;
+}
+document.onkeydown=e=>{
+if(e.code=="Space"||e.code=="ArrowUp")jump();
+};
+
+function loop(){
+if(!alive)return;
+v-=.7;y+=v;
+if(y<0){y=0;v=0}
+player.style.bottom=y+"px";
+requestAnimationFrame(loop);
+}
+
+function spawn(){
+if(!alive)return;
+let o=document.createElement("div");
+o.className="obs";
+o.style.height=(50+Math.random()*80)+"px";
+game.appendChild(o);
+let x=900;
+let m=setInterval(()=>{
+x-=7;o.style.left=x+"px";
+let a=player.getBoundingClientRect(),b=o.getBoundingClientRect();
+if(a.left<b.right&&a.right>b.left&&a.bottom>b.top){
+alive=false;
+gameover.style.display="flex";
+result.innerHTML=username+" score: "+score;
+}
+if(x< -50){o.remove();clearInterval(m);score++;score.innerHTML="Score: "+score}
+},20);
+setTimeout(spawn,1500);
+}
+</script>
+</body>
+</html>
